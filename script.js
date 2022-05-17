@@ -1,7 +1,8 @@
 
 let total_cnt =     [ 5, 5, 5, 5, 5, 5, 5 , 5, 5, 5 ] ; 
 let cart_cnt = [ 0, 0, 0, 0, 0, 0, 0 , 0, 0, 0] ; 
-let item_cost = [200 ,30 ,50 , 23,234, 4  ] ; 
+let item_cost = [0 ,1000 ,1100, 1000,1100, 1000,100  ] ; 
+let item_name =["ads" , "Razer Blade", "Dell Alienware", "Asus tuf" ,"HP Victus" , "iphone 5"] ;
 
 let cartwin = document.querySelector('.cart-icon');
 let whole_cart_window = document.querySelector('.whole-cart-window');
@@ -62,7 +63,9 @@ for(let i = 0;i < btn.length  ; i++ ) {
         if(cart_cnt[id]-1 >=0)  {
             cart_cnt[id]-- ;
             mbtnClicked(id ) ;   
-   
+            removeTotal(id) ;
+            removeSubtotal(id ) ;
+
             let  par_div = get_div_cart(id)  ; 
             if(par_div == -1  ) return  ; 
             console.log("inside pbtn" , par_div) ; 
@@ -82,6 +85,10 @@ for(let i = 0;i < btn.length  ; i++ ) {
         console.log("id " , id , )  ; 
         if( cart_cnt[id]+ 1 <= total_cnt[id ] ) {
             cart_cnt[id ] ++  ;
+            addTotal(id) ;
+            addSubtotal(id) ;
+
+
             pbtnClicked(id ) ;   
             let  par_div = get_div_cart(id)  ; 
             if(par_div == -1  ) return  ; 
@@ -197,9 +204,9 @@ function mbtnClicked( id ) {
 
 
 
-console.log( total_cnt) ; 
-console.log( item_cnt_cart) ; 
-console.log( item_cost ) ; 
+// console.log( total_cnt) ; 
+// console.log( item_cnt_cart) ; 
+// console.log( item_cost ) ; 
 
 
 
@@ -242,7 +249,7 @@ function updateCart( id ){
     cartItem.innerHTML =  `
         <img src="images/${id}.jpg">
         <div class="details">
-            <h4>Item Name</h4>
+            <h4>${item_name[id]}</h4>
            
             <!-- <span class="quantity"> quantity: 1 </span>   -->
             <div class="card-btn-cart" >
@@ -251,7 +258,7 @@ function updateCart( id ){
                 <button class="plusBtnc">+</button>
             
             </div>            
-            <span class="price">Subtotal: $23.44 </span>  
+            <span class="price">Subtotal: $${sub_tot} </span>  
         
         </div> 
     `
@@ -267,19 +274,73 @@ function updateCart( id ){
     mbtnc.addEventListener('click' , cartMinusEvent) ;
     pbtnc.addEventListener('click' , cartPlusEvent ) ;
     
-    console.log("------------------------------------e")  ;
-
-    console.log(pbtnc);
-    console.log(mbtnc);
-     
-    console.log("------------------------------------e")  ;
-
     
-   
+    addTotal(id ) ;
+    // addSubtotal(id) ;
 
 
-    // console.log(cartItem.innerHTML ) ; 
-    // console.log(cartItem.getAttribute('class') ) ; 
+
+}
+
+function addTotal(id ){
+
+    let tot =  document.querySelector('.checkout') ;
+    let tot_price =  tot.innerText ;
+    tot_price = tot_price.replace('Total: $','') ;
+    tot_price =  item_cost[id] +  parseInt(tot_price) ; 
+    tot.innerHTML =  "Total: $"+tot_price ; 
+
+}
+function removeTotal(id ){
+    let tot =  document.querySelector('.checkout') ;
+    let tot_price =  tot.innerText ;
+    tot_price = tot_price.replace('Total: $','') ;
+    tot_price =  -item_cost[id]+  parseInt(tot_price) ; 
+    tot.innerHTML =  "Total: $"+tot_price ; 
+
+}
+function addSubtotal(id){
+    let x =  document.querySelectorAll('.cart-item') ;
+    console.log( "addsub " , x ) ;  
+    let  prod1 = -1; 
+    for(let i= 0 ;i<x.length ; i++   ) {
+        
+        if(x[i].getAttribute('id') == id  ){
+
+            console.log("---------------------------- ") ;            
+            let subTot =x[i].childNodes[3].childNodes[7].innerText ;
+            let _div= x[i].childNodes[3].childNodes[7] ;
+            subTot =  subTot.replace('Subtotal: $','') ;
+            subTot = parseInt(subTot)+ item_cost[id] ;
+            _div.innerHTML =  'Subtotal: $' +subTot ;
+            console.log(subTot ) ;
+            console.log("----------------------------edfdfs ") ;
+            break ;
+
+        }
+    }
+}
+function removeSubtotal(id){
+    let x =  document.querySelectorAll('.cart-item') ;
+    console.log( "addsub " , x ) ;  
+    let  prod1 = -1; 
+    for(let i= 0 ;i<x.length ; i++   ) {
+        
+        if(x[i].getAttribute('id') == id  ){
+
+            console.log("---------------------------- ") ;            
+            let subTot =x[i].childNodes[3].childNodes[7].innerText ;
+            let _div= x[i].childNodes[3].childNodes[7] ;
+            subTot =  subTot.replace('Subtotal: $','') ;
+            subTot = parseInt(subTot) -  item_cost[id] ;
+            _div.innerHTML =  'Subtotal: $' +subTot ;
+            console.log(subTot ) ;
+            console.log("----------------------------edfdfs ") ;
+            break ;
+
+        }
+    }
+  
 }
 
 // updateCart(1); 
@@ -304,6 +365,8 @@ function  cartMinusEvent(e) {
     
     if( cart_cnt[prod_id]-1  >= 0  ) {
         cart_cnt[prod_id]-- ; 
+        removeTotal(prod_id) ;
+        removeSubtotal(prod_id) ;
         delItemCart(par_div , prod_id  )  ;
         mbtnClicked(prod_id) ; 
         
@@ -319,6 +382,9 @@ function cartPlusEvent(e)  {
     console.log("+ clilcked ", cart_cnt[prod_id]   ) ; 
     console.log(par_div ) ;
     if( cart_cnt[prod_id ]+1 <= total_cnt[prod_id]  ) {
+        addTotal(prod_id) ;
+        addSubtotal(id) ;
+
         cart_cnt[prod_id]++ ; 
         addItemCart(par_div ,prod_id  ) ; 
         pbtnClicked( prod_id ) ;
